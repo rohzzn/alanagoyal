@@ -103,7 +103,7 @@ export const staticNotes: Note[] = [
   {
     id: "education",
     slug: "education",
-    title: "education & certifications",
+    title: "education",
     content: `## malla reddy engineering college
 **bachelor of technology in computer science** | graduated 2024  
 *cgpa: 8.49*
