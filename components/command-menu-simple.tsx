@@ -6,7 +6,6 @@ import {
   useCallback,
   forwardRef,
   useImperativeHandle,
-  useContext,
 } from "react";
 import {
   CommandDialog,
@@ -19,21 +18,17 @@ import {
 } from "./ui/command";
 import { DialogTitle, DialogDescription } from "./ui/dialog";
 import { useRouter } from "next/navigation";
-import { Pin, ArrowUp, ArrowDown, Trash, PenSquare } from "lucide-react";
-import { createNote } from "@/lib/create-note";
+import { Pin, ArrowUp, ArrowDown } from "lucide-react";
 import { searchNotes } from "@/lib/search";
 import { Note } from "@/lib/types";
-import { SessionNotesContext } from "@/app/notes/session-notes";
 import { useTheme } from "next-themes";
 import { Moon, Sun } from "lucide-react";
 
 export interface CommandMenuProps {
   notes: Note[];
-  sessionId: string;
   addNewPinnedNote: (slug: string) => void;
   navigateNotes: (direction: "up" | "down") => void;
   togglePinned: (slug: string) => void;
-  deleteNote: (note: Note) => void;
   highlightedNote: Note | null;
   ref: React.RefObject<{ setOpen: (open: boolean) => void }>;
   setSelectedNoteSlug: (slug: string | null) => void;
@@ -47,11 +42,9 @@ export const CommandMenu = forwardRef<
   (
     {
       notes,
-      sessionId,
       addNewPinnedNote,
       navigateNotes,
       togglePinned,
-      deleteNote,
       highlightedNote,
       setSelectedNoteSlug,
       isMobile,
@@ -105,20 +98,6 @@ export const CommandMenu = forwardRef<
       );
     }
 
-    const { refreshSessionNotes } = useContext(SessionNotesContext);
-
-    const handleCreateNote = () => {
-      createNote(
-        sessionId,
-        router,
-        addNewPinnedNote,
-        refreshSessionNotes,
-        setSelectedNoteSlug,
-        isMobile
-      );
-      setOpen(false);
-    };
-
     const handleNoteSelect = (slug: string) => {
       router.push(`/notes/${slug}`);
       setOpen(false);
@@ -141,20 +120,7 @@ export const CommandMenu = forwardRef<
       }
     }, [highlightedNote, togglePinned]);
 
-    const handleDeleteNote = useCallback(() => {
-      if (highlightedNote) {
-        deleteNote(highlightedNote);
-        setOpen(false);
-      }
-    }, [highlightedNote, deleteNote]);
-
     const commands = [
-      {
-        name: "New note",
-        icon: <PenSquare />,
-        shortcut: "N",
-        action: handleCreateNote,
-      },
       {
         name: "Pin or unpin",
         icon: <Pin />,
@@ -174,12 +140,6 @@ export const CommandMenu = forwardRef<
         action: handleMoveDown,
       },
       {
-        name: "Delete note",
-        icon: <Trash />,
-        shortcut: "D",
-        action: handleDeleteNote,
-      },
-      {
         name: "Toggle theme",
         icon: theme === "light" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />,
         shortcut: "T",
@@ -190,7 +150,7 @@ export const CommandMenu = forwardRef<
       },
     ];
 
-    const filteredNotes = searchNotes(notes, searchTerm, sessionId);
+    const filteredNotes = searchNotes(notes, searchTerm);
     const filteredCommands = commands.filter((command) =>
       command.name.toLowerCase().includes(searchTerm.toLowerCase())
     );

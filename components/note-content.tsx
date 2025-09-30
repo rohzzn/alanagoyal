@@ -1,33 +1,11 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import { Textarea } from "./ui/textarea";
+import { useCallback } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Note } from "@/lib/types";
 
-export default function NoteContent({
-  note,
-  saveNote,
-  canEdit,
-}: {
-  note: Note;
-  saveNote: (updates: Partial<Note>) => void;
-  canEdit: boolean;
-}) {
-  const [isEditing, setIsEditing] = useState(!note.content && canEdit);
-
-  const handleChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    saveNote({ content: e.target.value });
-  }, [saveNote]);
-
-  const handleMarkdownCheckboxChange = useCallback((taskText: string, isChecked: boolean) => {
-    const updatedContent = note.content.replace(
-      new RegExp(`\\[[ x]\\] ${taskText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`, 'g'),
-      `[${isChecked ? 'x' : ' '}] ${taskText}`
-    );
-    saveNote({ content: updatedContent });
-  }, [note.content, saveNote]);
+export default function NoteContent({ note }: { note: Note }) {
 
   const renderListItem = useCallback(({ children, ...props }: any) => {
     if (!props.className?.includes('task-list-item')) return <li {...props}>{children}</li>;
@@ -45,18 +23,10 @@ export default function NoteContent({
 
     const taskId = `task-${taskText.substring(0, 20).replace(/\s+/g, '-').toLowerCase()}-${props.index}`;
 
-    const handleCheckboxClick = (e: React.MouseEvent) => {
-      e.stopPropagation();
-      if (canEdit) handleMarkdownCheckboxChange(taskText, !isChecked);
-    };
-
     return (
       <li {...props}>
         <span className="flex items-start">
-          <span
-            onClick={handleCheckboxClick}
-            className={`${canEdit ? 'cursor-pointer' : 'cursor-default'} mr-1`}
-          >
+          <span className="cursor-default mr-1">
             <input
               type="checkbox"
               checked={isChecked}
@@ -69,7 +39,7 @@ export default function NoteContent({
         </span>
       </li>
     );
-  }, [canEdit, handleMarkdownCheckboxChange]);
+  }, []);
 
   const renderLink = useCallback((props: React.AnchorHTMLAttributes<HTMLAnchorElement>) => {
     return (
@@ -81,37 +51,18 @@ export default function NoteContent({
 
   return (
     <div className="px-2">
-      {(isEditing && canEdit) || (!note.content && canEdit) ? (
-        <Textarea
-          id="note-content"
-          value={note.content || ""}
-          className="min-h-dvh focus:outline-none leading-normal"
-          placeholder="Start writing..."
-          onChange={handleChange}
-          onFocus={() => setIsEditing(true)}
-          onBlur={() => setIsEditing(false)}
-        />
-      ) : (
-        <div
-          className="h-full text-sm"
-          onClick={(e) => {
-            if (canEdit && !note.public) {
-              setIsEditing(true);
-            }
+      <div className="h-full text-sm">
+        <ReactMarkdown
+          className="markdown-body min-h-dvh"
+          remarkPlugins={[remarkGfm]}
+          components={{
+            li: renderListItem,
+            a: renderLink,
           }}
         >
-          <ReactMarkdown
-            className="markdown-body min-h-dvh"
-            remarkPlugins={[remarkGfm]}
-            components={{
-              li: renderListItem,
-              a: renderLink,
-            }}
-          >
-            {note.content || "Start writing..."}
-          </ReactMarkdown>
-        </div>
-      )}
+          {note.content || "No content available"}
+        </ReactMarkdown>
+      </div>
     </div>
   );
 }

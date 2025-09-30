@@ -1,22 +1,18 @@
 import { useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { NoteItem } from "./note-item";
+import { NoteItem } from "./note-item-simple";
 import { Note } from "@/lib/types";
 
 interface SidebarContentProps {
   groupedNotes: Record<string, Note[]>;
   selectedNoteSlug: string | null;
   onNoteSelect: (note: Note) => void;
-  sessionId: string;
   handlePinToggle: (slug: string) => void;
   pinnedNotes: Set<string>;
   localSearchResults: Note[] | null;
   highlightedIndex: number;
   categoryOrder: string[];
   labels: Record<string, React.ReactNode>;
-  handleNoteDelete: (note: Note) => Promise<void>;
-  openSwipeItemSlug: string | null;
-  setOpenSwipeItemSlug: React.Dispatch<React.SetStateAction<string | null>>;
   clearSearch: () => void;
   setSelectedNoteSlug: (slug: string | null) => void;
 }
@@ -25,16 +21,12 @@ export function SidebarContent({
   groupedNotes,
   selectedNoteSlug,
   onNoteSelect,
-  sessionId,
   handlePinToggle,
   pinnedNotes,
   localSearchResults,
   highlightedIndex,
   categoryOrder,
   labels,
-  handleNoteDelete,
-  openSwipeItemSlug,
-  setOpenSwipeItemSlug,
   clearSearch,
   setSelectedNoteSlug,
 }: SidebarContentProps) {
@@ -48,22 +40,6 @@ export function SidebarContent({
     [clearSearch, handlePinToggle]
   );
 
-  const handleEdit = useCallback(
-    (slug: string) => {
-      clearSearch();
-      router.push(`/notes/${slug}`);
-      setSelectedNoteSlug(slug);
-    },
-    [clearSearch, router, setSelectedNoteSlug]
-  );
-
-  const handleDelete = useCallback(
-    async (note: Note) => {
-      clearSearch();
-      await handleNoteDelete(note);
-    },
-    [clearSearch, handleNoteDelete]
-  );
 
   return (
     <div className="py-2">
@@ -83,16 +59,11 @@ export function SidebarContent({
                         key={index}
                         item={item}
                         selectedNoteSlug={selectedNoteSlug}
-                        sessionId={sessionId}
                         onNoteSelect={onNoteSelect}
                         handlePinToggle={handlePinToggle}
                         isPinned={pinnedNotes.has(item.slug)}
                         isHighlighted={false}
                         isSearching={false}
-                        handleNoteDelete={handleNoteDelete}
-                        onNoteEdit={handleEdit}
-                        openSwipeItemSlug={openSwipeItemSlug}
-                        setOpenSwipeItemSlug={setOpenSwipeItemSlug}
                         showDivider={index < groupedNotes[categoryKey].length - 1}
                       />
                     )
@@ -109,16 +80,11 @@ export function SidebarContent({
               key={item.id}
               item={item}
               selectedNoteSlug={selectedNoteSlug}
-              sessionId={sessionId}
               onNoteSelect={onNoteSelect}
               handlePinToggle={handlePinToggleWithClear}
               isPinned={pinnedNotes.has(item.slug)}
               isHighlighted={index === highlightedIndex}
               isSearching={true}
-              handleNoteDelete={handleDelete}
-              onNoteEdit={handleEdit}
-              openSwipeItemSlug={openSwipeItemSlug}
-              setOpenSwipeItemSlug={setOpenSwipeItemSlug}
               showDivider={index < localSearchResults.length - 1}
             />
           ))}

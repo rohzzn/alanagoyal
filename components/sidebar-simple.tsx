@@ -6,20 +6,15 @@ import {
   useCallback,
   useRef,
   useMemo,
-  useContext,
 } from "react";
 import { usePathname } from "next/navigation";
-import SessionId from "./session-id";
 import { Pin } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { CommandMenu } from "./command-menu";
+import { CommandMenu } from "./command-menu-simple";
 import { SidebarContent } from "./sidebar-content";
 import { SearchBar } from "./search";
 import { groupNotesByCategory, sortGroupedNotes } from "@/lib/note-utils";
-import { createClient } from "@/utils/supabase/client";
 import { Note } from "@/lib/types";
-import { toast } from "./ui/use-toast";
-import { SessionNotesContext } from "@/app/notes/session-notes";
 import { Nav } from "./nav";
 import { useTheme } from "next-themes";
 import { ScrollArea } from "./ui/scroll-area";
@@ -44,37 +39,28 @@ export default function Sidebar({
   onNoteSelect,
   isMobile,
 }: {
-  notes: any[];
-  onNoteSelect: (note: any) => void;
+  notes: Note[];
+  onNoteSelect: (note: Note) => void;
   isMobile: boolean;
 }) {
   const router = useRouter();
-  const supabase = createClient();
 
   const [isScrolled, setIsScrolled] = useState(false);
   const [selectedNoteSlug, setSelectedNoteSlug] = useState<string | null>(null);
   const [pinnedNotes, setPinnedNotes] = useState<Set<string>>(new Set());
   const pathname = usePathname();
   const searchInputRef = useRef<HTMLInputElement>(null);
-  const [localSearchResults, setLocalSearchResults] = useState<any[] | null>(
-    null
-  );
+  const [localSearchResults, setLocalSearchResults] = useState<Note[] | null>(null);
   const [highlightedIndex, setHighlightedIndex] = useState(0);
   const [groupedNotes, setGroupedNotes] = useState<any>({});
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
-  const [openSwipeItemSlug, setOpenSwipeItemSlug] = useState<string | null>(
-    null
-  );
   const [highlightedNote, setHighlightedNote] = useState<Note | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const commandMenuRef = useRef<{ setOpen: (open: boolean) => void } | null>(
-    null
-  );
-
-  const selectedNoteRef = useRef<HTMLDivElement>(null);
-
+  const commandMenuRef = useRef<{ setOpen: (open: boolean) => void } | null>(null);
   const scrollViewportRef = useRef<HTMLDivElement>(null);
+
+  const notes = useMemo(() => publicNotes, [publicNotes]);
 
   useEffect(() => {
     if (selectedNoteSlug && scrollViewportRef.current) {
@@ -87,27 +73,6 @@ export default function Sidebar({
       }
     }
   }, [selectedNoteSlug]);
-
-  useEffect(() => {
-    if (selectedNoteRef.current) {
-      selectedNoteRef.current.scrollIntoView({
-        behavior: 'smooth',
-        block: 'nearest'
-      });
-    }
-  }, [selectedNoteSlug, highlightedIndex]);
-
-  const {
-    notes: sessionNotes,
-    sessionId,
-    setSessionId,
-    refreshSessionNotes,
-  } = useContext(SessionNotesContext);
-
-  const notes = useMemo(
-    () => [...publicNotes, ...sessionNotes],
-    [publicNotes, sessionNotes]
-  );
 
   useEffect(() => {
     if (pathname) {
@@ -132,12 +97,7 @@ export default function Sidebar({
     } else {
       const initialPinnedNotes = new Set(
         notes
-          .filter(
-            (note) =>
-              note.slug === "about-me" ||
-              note.slug === "quick-links" ||
-              note.session_id === sessionId
-          )
+          .filter((note) => note.slug === "about-me" || note.slug === "quick-links")
           .map((note) => note.slug)
       );
       setPinnedNotes(initialPinnedNotes);
@@ -146,16 +106,13 @@ export default function Sidebar({
         JSON.stringify(Array.from(initialPinnedNotes))
       );
     }
-  }, [notes, sessionId]);
+  }, [notes]);
 
   useEffect(() => {
-    const userSpecificNotes = notes.filter(
-      (note) => note.public || note.session_id === sessionId
-    );
-    const grouped = groupNotesByCategory(userSpecificNotes, pinnedNotes);
+    const grouped = groupNotesByCategory(notes, pinnedNotes);
     sortGroupedNotes(grouped);
     setGroupedNotes(grouped);
-  }, [notes, sessionId, pinnedNotes]);
+  }, [notes, pinnedNotes]);
 
   useEffect(() => {
     if (localSearchResults && localSearchResults.length > 0) {
@@ -172,7 +129,7 @@ export default function Sidebar({
     if (searchInputRef.current) {
       searchInputRef.current.value = "";
     }
-  }, [setLocalSearchResults, setHighlightedIndex]);
+  }, []);
 
   const flattenedNotes = useCallback(() => {
     return categoryOrder.flatMap((category) =>
@@ -190,18 +147,15 @@ export default function Sidebar({
         
         let nextIndex;
         if (direction === "up") {
-          nextIndex =
-            currentIndex > 0 ? currentIndex - 1 : flattened.length - 1;
+          nextIndex = currentIndex > 0 ? currentIndex - 1 : flattened.length - 1;
         } else {
-          nextIndex =
-            currentIndex < flattened.length - 1 ? currentIndex + 1 : 0;
+          nextIndex = currentIndex < flattened.length - 1 ? currentIndex + 1 : 0;
         }
 
         const nextNote = flattened[nextIndex];
         
         if (nextNote) {
           router.push(`/notes/${nextNote.slug}`);
-          // Wait for router navigation and React re-render
           setTimeout(() => {
             const selectedElement = document.querySelector(`[data-note-slug="${nextNote.slug}"]`);
             if (selectedElement) {
@@ -216,14 +170,12 @@ export default function Sidebar({
 
   const handlePinToggle = useCallback(
     (slug: string) => {
-      let isPinning = false;
       setPinnedNotes((prev) => {
         const newPinned = new Set(prev);
-        isPinning = !newPinned.has(slug);
-        if (isPinning) {
-          newPinned.add(slug);
-        } else {
+        if (newPinned.has(slug)) {
           newPinned.delete(slug);
+        } else {
+          newPinned.add(slug);
         }
         localStorage.setItem(
           "pinnedNotes",
@@ -237,77 +189,8 @@ export default function Sidebar({
       if (!isMobile) {
         router.push(`/notes/${slug}`);
       }
-
-      toast({
-        description: isPinning ? "Note pinned" : "Note unpinned",
-      });
     },
     [router, isMobile, clearSearch]
-  );
-
-  const handleNoteDelete = useCallback(
-    async (noteToDelete: Note) => {
-      if (noteToDelete.public) {
-        toast({
-          description: "Oops! You can't delete public notes",
-        });
-        return;
-      }
-
-      try {
-        if (noteToDelete.id && sessionId) {
-          await supabase.rpc("delete_note", {
-            uuid_arg: noteToDelete.id,
-            session_arg: sessionId,
-          });
-        }
-
-        setGroupedNotes((prevGroupedNotes: Record<string, Note[]>) => {
-          const newGroupedNotes = { ...prevGroupedNotes };
-          for (const category in newGroupedNotes) {
-            newGroupedNotes[category] = newGroupedNotes[category].filter(
-              (note: Note) => note.slug !== noteToDelete.slug
-            );
-          }
-          return newGroupedNotes;
-        });
-
-        const allNotes = flattenedNotes();
-        const deletedNoteIndex = allNotes.findIndex(
-          (note) => note.slug === noteToDelete.slug
-        );
-
-        let nextNote;
-        if (deletedNoteIndex === 0) {
-          nextNote = allNotes[1];
-        } else {
-          nextNote = allNotes[deletedNoteIndex - 1];
-        }
-
-        if (!isMobile) {
-          router.push(nextNote ? `/notes/${nextNote.slug}` : "/notes/about-me");
-        }
-
-        clearSearch();
-        refreshSessionNotes();
-        router.refresh();
-
-        toast({
-          description: "Note deleted",
-        });
-      } catch (error) {
-        console.error("Error deleting note:", error);
-      }
-    },
-    [
-      supabase,
-      sessionId,
-      flattenedNotes,
-      isMobile,
-      clearSearch,
-      refreshSessionNotes,
-      router,
-    ]
   );
 
   const goToHighlightedNote = useCallback(() => {
@@ -331,7 +214,6 @@ export default function Sidebar({
       k: () => navigateNotes("up"),
       ArrowUp: () => navigateNotes("up"),
       p: () => highlightedNote && handlePinToggle(highlightedNote.slug),
-      d: () => highlightedNote && handleNoteDelete(highlightedNote),
       "/": () => searchInputRef.current?.focus(),
       Escape: () => (document.activeElement as HTMLElement)?.blur(),
       t: () => setTheme(theme === "dark" ? "light" : "dark"),
@@ -396,7 +278,6 @@ export default function Sidebar({
     handlePinToggle,
     localSearchResults,
     setHighlightedIndex,
-    handleNoteDelete,
     commandMenuRef,
     goToHighlightedNote,
     setTheme,
@@ -404,7 +285,7 @@ export default function Sidebar({
   ]);
 
   const handleNoteSelect = useCallback(
-    (note: any) => {
+    (note: Note) => {
       onNoteSelect(note);
       if (!isMobile) {
         router.push(`/notes/${note.slug}`);
@@ -445,14 +326,11 @@ export default function Sidebar({
         isMobile={isMobile}
       >
         <div ref={scrollViewportRef} className="flex flex-col w-full">
-          <SessionId setSessionId={setSessionId} />
           <CommandMenu
             notes={notes}
-            sessionId={sessionId}
             addNewPinnedNote={handlePinToggle}
             navigateNotes={navigateNotes}
             togglePinned={handlePinToggle}
-            deleteNote={handleNoteDelete}
             highlightedNote={highlightedNote}
             setSelectedNoteSlug={setSelectedNoteSlug}
             isMobile={isMobile}
@@ -461,7 +339,6 @@ export default function Sidebar({
             <SearchBar
               notes={notes}
               onSearchResults={setLocalSearchResults}
-              sessionId={sessionId}
               inputRef={searchInputRef}
               searchQuery={searchQuery}
               setSearchQuery={setSearchQuery}
@@ -472,16 +349,12 @@ export default function Sidebar({
               groupedNotes={groupedNotes}
               selectedNoteSlug={selectedNoteSlug}
               onNoteSelect={handleNoteSelect}
-              sessionId={sessionId}
               handlePinToggle={handlePinToggle}
               pinnedNotes={pinnedNotes}
               localSearchResults={localSearchResults}
               highlightedIndex={highlightedIndex}
               categoryOrder={categoryOrder}
               labels={labels}
-              handleNoteDelete={handleNoteDelete}
-              openSwipeItemSlug={openSwipeItemSlug}
-              setOpenSwipeItemSlug={setOpenSwipeItemSlug}
               clearSearch={clearSearch}
               setSelectedNoteSlug={setSelectedNoteSlug}
             />

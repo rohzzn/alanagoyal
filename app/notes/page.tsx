@@ -2,9 +2,9 @@ import { Metadata } from "next";
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
-    title: "notes",
+    title: "vanshita | notes",
     openGraph: {
-      images: [`/notes/api/og/?title=${encodeURIComponent("notes")}&emoji=${encodeURIComponent("✏️")}`],
+      images: [`/notes/api/og/?title=${encodeURIComponent("portfolio")}&emoji=${encodeURIComponent("👋")}`],
     },
   };
 }

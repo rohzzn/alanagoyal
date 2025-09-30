@@ -5,7 +5,6 @@ import { Icons } from "./icons";
 interface SearchBarProps {
   notes: Note[];
   onSearchResults: (results: Note[] | null) => void;
-  sessionId: string;
   inputRef: RefObject<HTMLInputElement>;
   searchQuery: string;
   setSearchQuery: (query: string) => void;
@@ -16,7 +15,6 @@ interface SearchBarProps {
 export function SearchBar({
   notes,
   onSearchResults,
-  sessionId,
   inputRef,
   searchQuery,
   setSearchQuery,
@@ -44,9 +42,8 @@ export function SearchBar({
 
     const filteredNotes = notes.filter(
       (note) =>
-        (note.public || note.session_id === sessionId) &&
-        (note.title.toLowerCase().includes(query.trim().toLowerCase()) ||
-          note.content.toLowerCase().includes(query.trim().toLowerCase()))
+        note.title.toLowerCase().includes(query.trim().toLowerCase()) ||
+        note.content.toLowerCase().includes(query.trim().toLowerCase())
     );
 
     onSearchResults(filteredNotes);
