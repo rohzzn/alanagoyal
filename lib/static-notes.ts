@@ -13,7 +13,7 @@ export const staticNotes: Note[] = [
     content: `hi, i'm vanshita medala!
 
 ## currently
-- application developer at accenture (mumbai)
+- associate software engineer developer at accenture (mumbai)
 - allergic to mornings
 - debugging code that was definitely written at 3am
 - making computers question their life choices
@@ -78,7 +78,7 @@ export const staticNotes: Note[] = [
     slug: "experience",
     title: "experience",
     content: `## accenture
-**application developer** | jun 2024 – present  
+**associate software engineer developer** | jun 2024 – present  
 *mumbai, india*
 
 - developing automation solutions and integrating new functionalities into existing systems
@@ -92,7 +92,7 @@ export const staticNotes: Note[] = [
 
 - utilized sqlite to create and maintain databases, enhancing data retrieval efficiency by 40%
 - performed data processing with numpy, resulting in a 35% reduction in processing time
-- contributed to image and video processing using opencv for computer vision applications
+- contributed to image and video processing using opencv for computer vision associate software engineers
 - gained hands-on experience with data analysis and machine learning workflows`,
     created_at: getCurrentTime(),
     session_id: "",
@@ -120,7 +120,7 @@ export const staticNotes: Note[] = [
 **graduated 2020**
 
 ## johnson grammar school icse & ib
-**graduated 2017**
+**graduated 2018**
 
 ## achievements & activities
 - secured 2-star ranking on codechef

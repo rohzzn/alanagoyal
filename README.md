@@ -23,7 +23,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY="<your-anon-key>"
 
 ## run the app
 
-run the application in the command line and it will be available at http://localhost:3000.
+run the associate software engineer in the command line and it will be available at http://localhost:3000.
 
 `npm run dev`
 
