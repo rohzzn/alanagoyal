@@ -45,7 +45,7 @@ export const staticNotes: Note[] = [
 
 ### credit card fraud detection
 **tech stack**: python, django, mysql, javascript  
-[source code](https://github.com/vanshita)
+[source code](https://github.com/vanshitamedala/Credit-Card-Fraud-Detection)
 
 - enhanced fraud detection with machine learning algorithms
 - implemented extreme learning method cnns and xg boost
@@ -54,7 +54,7 @@ export const staticNotes: Note[] = [
 
 ### image encryption decryption
 **tech stack**: java  
-[source code](https://github.com/vanshita)
+[source code](https://github.com/vanshitamedala/ImageEncryption)
 
 - developed secure image data handling tool with xor encryption
 - created user-friendly gui for easy image selection and key input
@@ -62,7 +62,7 @@ export const staticNotes: Note[] = [
 
 ### student record management
 **tech stack**: java swing  
-[source code](https://github.com/vanshita)
+[source code](https://github.com/vanshitamedala/Student-record-management-system)
 
 - developed user-friendly interface for efficient student record management
 - added interactive features for adding new students to records
