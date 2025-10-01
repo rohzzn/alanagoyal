@@ -13,7 +13,7 @@ export const staticNotes: Note[] = [
     content: `hi, i'm vanshita medala!
 
 ## currently
-- associate software engineer developer at accenture (mumbai)
+- associate software engineer at accenture (mumbai)
 - allergic to mornings
 - debugging code that was definitely written at 3am
 - making computers question their life choices
@@ -78,7 +78,7 @@ export const staticNotes: Note[] = [
     slug: "experience",
     title: "experience",
     content: `## accenture
-**associate software engineer developer** | jun 2024 – present  
+**associate software engineer** | jun 2024 – present  
 *mumbai, india*
 
 - developing automation solutions and integrating new functionalities into existing systems
