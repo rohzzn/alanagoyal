@@ -13,11 +13,11 @@ export const staticNotes: Note[] = [
     content: `hi, i'm vanshita medala!
 
 ## currently
-- associate software engineer at accenture (mumbai)
-- shipping on conrad (because why not?)
-- debugging code that was probably written at 3am
-- pretending to understand what "synergy" means in meetings
-- making computers question their life choices`,
+- application developer at accenture (mumbai)
+- allergic to mornings
+- debugging code that was definitely written at 3am
+- making computers question their life choices
+- will trade secrets for burgers`,
     created_at: getCurrentTime(),
     session_id: "",
     emoji: "📍",
@@ -78,13 +78,13 @@ export const staticNotes: Note[] = [
     slug: "experience",
     title: "experience",
     content: `## accenture
-**associate software engineer** | jun 2024 – present  
+**application developer** | jun 2024 – present  
 *mumbai, india*
 
 - developing automation solutions and integrating new functionalities into existing systems
 - conducting software analysis, programming, testing, and debugging to support project requirements
-- providing customer support and resolving incidents through various communication channels
-- working with cutting-edge technologies to deliver client solutions
+- collaborating with cross-functional teams to deliver scalable software solutions
+- implementing best practices for code quality and system performance optimization
 
 ## path creators
 **data analysis intern** | jun 2023 – sep 2023  
@@ -105,8 +105,8 @@ export const staticNotes: Note[] = [
     slug: "education",
     title: "education",
     content: `## malla reddy engineering college
-**bachelor of technology in computer science** | graduated 2024  
-*cgpa: 8.49*
+**bachelor of technology in computer science**  
+**graduated 2024**
 
 ### key coursework
 - data structures and algorithms
@@ -115,6 +115,12 @@ export const staticNotes: Note[] = [
 - machine learning and ai
 - computer networks
 - web development
+
+## fiitjee
+**graduated 2020**
+
+## johnson grammar school icse & ib
+**graduated 2017**
 
 ## achievements & activities
 - secured 2-star ranking on codechef

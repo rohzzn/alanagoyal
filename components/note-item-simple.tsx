@@ -42,10 +42,10 @@ export function NoteItem({
 }: NoteItemProps) {
   const isMobile = useMobileDetect();
   const [currentDate, setCurrentDate] = useState(() => {
-    // Special case for education note - show a random date in July 2024
+    // Special case for education note - always show 7/5/2024
     if (item.slug === "education") {
-      const july2024 = new Date(2024, 6, Math.floor(Math.random() * 31) + 1); // July is month 6 (0-indexed)
-      return july2024.toLocaleDateString("en-US");
+      const fixedDate = new Date(2024, 6, 5); // July 5, 2024 (month 6 is July, 0-indexed)
+      return fixedDate.toLocaleDateString("en-US");
     }
     return new Date().toLocaleDateString("en-US");
   });
